@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caça-palavras</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+	<style type="text/css">
+		body {
+    background: url("img/fundo.png");
+    background-size: cover;
+    background-position-y: 100%;
+    display: flex;
+    justify-content: center;
+}
+	</style>
+<body>
+    <style>
+        table {
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
+    </style>
+
+    <div class="mx-auto my-5 container">
+        <h3>CAÇA-PALAVRAS 🔎</h3>
+        <div>
+            Tempo decorrido: <span id="time"></span>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12 col-lg-10">
+                <div class="table-responsive bg-light">
+                    <table class="table table-bordered m-0" id="letters-box"></table>
+                </div>
+            </div>
+            <div class="col-12 col-lg-2">
+                <ul id="words">
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-alert" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Parabéns</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="alert">
+                    Você venceu!!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function() {
+
+            var time = 0;
+            var interval = setInterval(() => {
+                time++;
+                $("#time").html(time + " segundos");
+            }, 1000);
+
+            var baseWords = [
+                "CONSERVAÇÃO",
+                "AMBIENTE",
+                "CHUVA",
+                "FAUNA",
+                "PRESERVAÇÃO",
+                "ÁGUA",
+                "ANIMAL",
+                "VIDA",
+                "RECICLAR",
+                "SOL",
+                "HABITAT",
+                "PLANTA",
+                "FLORA",
+                "ECOLOGIA",
+                "ORGÂNICO",
+                "NATUREZA",
+                "BIODIVERSIDADE",
+                "BIOSFERA",
+                "FOTOSSÍNTESE",
+                "ECOSSISTEMA",
+                "PRESERVAR",
+                "FLOR",
+                "MAR",
+                "TERRA",
+                "NUVEM",
+                "SOCIEDADE",
+                "HOMEM",
+                "POPULAÇÃO",
+                "GERAÇÕES",
+                "CONSUMO",
+                "INCETOS",
+                "ECOLOGIA",
+                "PRESERVAR",
+                "RESÍDUO",
+                "ÁRVORES",
+                "SAÚDAVEL",
+                "ECO",
+                "MAMÍFEROS",
+                "AQUÁTICO",
+                "PEIXE",
+                "HABITAT",
+                "EQUILÍBRIO",
+                "EVOLUIR",
+                "REUTILIZAÇÃO",
+                "AR",
+                "NASCENTE",
+                "BACIA",
+                "BIOSFERA",
+                "OZÔNIO",
+                "COMPOSTAGEM",
+                "FRUTAS",
+                "DESERTIFICAÇÃO",
+                "ECODESENVOLVIMENTO",
+                "RECURSOS",
+                "CONEMA",
+                "ATMOSFERA",
+                "LITOSFERA",
+                "HIDROSFERA",
+                "BIOSFERA",
+                "PLÁSTICO",
+                "PAPEL",
+                "VIDRO",
+                "METAIS",
+                "MEIO",
+                "AGROECOLOGIA",
+                "BIÓLOGO",
+                "HORTA",
+                "FLORESTA",
+                "FATORES"
+            ];
+
+            var size = 20;
+            var wordsSize = 10;
+
+            var letters = new Array();
+            var words = new Array();
+            for (let i = 1; i <= size; i++) { // CRIAÇÃO DA MATRIZ E SELECIONANDO PALAVRAS
+                if (i <= wordsSize) {
+                    words.push(baseWords[Math.floor(Math.random() * baseWords.length)]);
+                }
+
+                var line = new Array();
+                for (let y = 1; y <= size; y++) {
+                    line.push(String.fromCharCode(65+Math.floor(Math.random() * 26)));
+                }
+
+                letters.push(line)
+            }
+
+            var words = words.filter(function(item, pos) { // LIMPANDO ITENS REPETIDOS
+                return words.indexOf(item)== pos;
+            });
+
+            let lines = new Array();
+            words.forEach(word => { // CADA PALAVRA VAI NUMA LINHA ALEATÓRIA UNICA
+                let column_position = Math.floor(Math.random() * (size - word.length));
+                let line_position = Math.floor(Math.random() * size);
+
+                while (lines.includes(line_position)) {
+                    line_position = Math.floor(Math.random() * size);
+                }
+
+                lines.push(line_position);
+
+                for (let x = 0; x < word.length; x++) {
+                    letters[line_position][column_position] = word[x];
+                    column_position++;
+                }
+
+                $("#words").append('<li id="' + word + '">' + word + '</li>');
+            });
+
+            letters.forEach(function(line, lineIndex) { // ADICIONANDO AS LETRAS A TABELA
+                var box = "";
+                line.forEach(function(letter, letterIndex) {
+                    box += '<td id="letter-' + letterIndex + '">' + letter + '</td>';
+                });
+
+                $("#letters-box").append('<tr id="line-' + lineIndex + '">' + box + '</tr>');
+            });
+
+            // VALIDANDO OS EVENTOS DO MOUSE
+            var isDown = false;
+            $("body").on("mousedown", "td", function() {
+                isDown = true;
+                $(this).addClass("bg-info")
+            });
+
+            $("body").on("mouseup", "td", function() {
+                isDown = false;
+                validade();
+            });
+
+            $("body").on("mouseover", "td", function() {
+                if (isDown) {
+                    $(this).addClass("bg-info")
+                }
+            });
+
+            function validade() { // VERIFICA SE A PALAVRA SELECIONADA EXISTE NO ARRAY DE PALAVRAS DA RODADA
+                var word = '';
+                $.each($(".bg-info"), function (indexInArray, element) {
+                    word += $(element).html();
+                });
+
+                if (words.includes(word)) {
+                    $(".bg-info").addClass("bg-success");
+
+                    $("#" + word).addClass("text-success font-weight-bold");
+                }
+
+                $(".bg-info").removeClass("bg-info");
+
+                if ($("li.text-success").length == words.length) {
+                    $("#modal-alert").modal();
+                    clearInterval(interval);
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
+
